@@ -3,519 +3,564 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elevation Browser</title>
+<title>Elevation Browser 立面浏览器</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f0f1a;color:#c8c8d0;line-height:1.5}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0eff5;
+  color: #333;
+  line-height: 1.6;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+h1 {
+  text-align: center;
+  color: #5b21b6;
+  margin-bottom: 24px;
+  font-size: 1.8em;
+}
 
-/* ===== Setup Panel ===== */
-.setup{max-width:700px;margin:60px auto;padding:30px;background:#1a1a2e;border-radius:12px;border:1px solid #333}
-.setup h2{color:#e94560;margin-bottom:16px;font-size:20px}
-.setup p{margin-bottom:10px;color:#999;font-size:14px}
-.setup label{display:block;color:#aaa;margin:14px 0 6px;font-size:13px;font-weight:600}
-.setup input[type="text"]{width:100%;padding:10px 14px;border:1px solid #333;border-radius:8px;background:#12122a;color:#e0e0e0;font-size:14px;outline:none}
-.setup input:focus{border-color:#e94560}
-.setup .btn{display:inline-block;padding:10px 24px;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin-top:12px;transition:background .2s}
-.setup .btn:hover{background:#c73a52}
-.setup .btn:disabled{background:#555;cursor:wait}
-.setup .status{margin-top:14px;padding:12px;background:#12122a;border-radius:8px;font-size:13px;white-space:pre-wrap;max-height:300px;overflow-y:auto;display:none}
-.setup hr{border:none;border-top:1px solid #333;margin:24px 0}
-.setup textarea{width:100%;height:150px;padding:10px;border:1px solid #333;border-radius:8px;background:#12122a;color:#e0e0e0;font-size:12px;font-family:monospace;outline:none;resize:vertical}
-.setup textarea:focus{border-color:#e94560}
-.setup .hint{font-size:12px;color:#666;margin-top:6px}
-.setup .script-box{background:#0a0a18;border:1px solid #333;border-radius:8px;padding:14px;margin:10px 0;font-family:monospace;font-size:11px;color:#8f8;white-space:pre-wrap;max-height:200px;overflow-y:auto;cursor:pointer;position:relative}
-.setup .script-box:hover{border-color:#e94560}
-.setup .script-box::after{content:"点击复制";position:absolute;top:6px;right:10px;font-size:11px;color:#888;font-family:sans-serif}
-.setup .tab-bar{display:flex;gap:0;margin-bottom:16px}
-.setup .tab{padding:8px 20px;border:1px solid #333;background:#12122a;color:#888;cursor:pointer;font-size:13px;transition:all .2s}
-.setup .tab:first-child{border-radius:8px 0 0 8px}
-.setup .tab:last-child{border-radius:0 8px 8px 0}
-.setup .tab.active{background:#e94560;color:#fff;border-color:#e94560}
-.setup .tab-content{display:none}
-.setup .tab-content.active{display:block}
-.setup .success{color:#4caf50}
-.setup .error{color:#e94560}
+/* ===== Filter Panel ===== */
+.filter-panel {
+  background: linear-gradient(135deg, #faf8ff 0%, #f5f0ff 100%);
+  border: 2px solid #8b5cf6;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 12px rgba(139,92,246,0.1);
+}
+.filter-panel h2 {
+  color: #6d28d9;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  border-bottom: 1px solid #e0d4f5;
+  padding-bottom: 10px;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+@media (max-width: 640px) {
+  .filter-grid { grid-template-columns: 1fr; }
+}
+.filter-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #5b21b6;
+  font-size: 0.88em;
+}
+.filter-group select,
+.filter-group input[type="number"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid #d4d0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s;
+}
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+}
+.range-inputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.range-inputs input { width: 42%; }
+.range-inputs span { color: #aaa; }
+.filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.btn-reset {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-reset:hover { background: #6d28d9; }
 
-/* ===== Header ===== */
-.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px;text-align:center;border-bottom:3px solid #e94560;position:sticky;top:0;z-index:100}
-.header h1{font-size:22px;color:#fff}
-.header h1 span{color:#e94560}
-.header p{font-size:13px;color:#8888aa;margin-top:4px}
-.search-bar{max-width:500px;margin:12px auto 0}
-.search-bar input{width:100%;padding:10px 16px;border:1px solid #333;border-radius:25px;background:#0f0f1a;color:#e0e0e0;font-size:14px;outline:none}
-.search-bar input:focus{border-color:#e94560}
-.search-bar input::placeholder{color:#555}
+/* ===== Results Header ===== */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.results-count { color: #666; font-size: 0.95em; }
+.sort-select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+}
 
-/* ===== Filters ===== */
-.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:14px 20px;background:#12122a;border-bottom:1px solid #222}
-.fbtn{padding:6px 16px;border:1px solid #e94560;background:transparent;color:#e94560;border-radius:20px;cursor:pointer;font-size:13px;transition:all .2s;white-space:nowrap}
-.fbtn:hover{background:#e9456033}
-.fbtn.active{background:#e94560;color:#fff}
+/* ===== Card ===== */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  border-left: 5px solid #8b5cf6;
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.card-title {
+  font-size: 1.5em;
+  color: #7c3aed;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.82em;
+  font-weight: 500;
+}
+.tag-size       { background: #eff6ff; color: #1e40af; }
+.tag-story      { background: #f0fdf4; color: #166534; }
+.tag-community  { background: #fef2f2; color: #991b1b; }
+.tag-material   { background: #fefce8; color: #854d0e; }
+.tag-style      { background: #fdf4ff; color: #86198f; }
+.tag-project    { background: #f0fdfa; color: #115e59; }
+.tag-revit      { background: #dcfce7; color: #15803d; font-weight: 700; }
 
-/* ===== Stats ===== */
-.stats{text-align:center;padding:10px;font-size:13px;color:#666}
-
-/* ===== Toolbar ===== */
-.toolbar{display:flex;justify-content:center;gap:10px;padding:0 20px 10px}
-.toolbar .btn-sm{padding:4px 14px;border:1px solid #444;background:transparent;color:#888;border-radius:6px;cursor:pointer;font-size:12px}
-.toolbar .btn-sm:hover{border-color:#e94560;color:#e94560}
-
-/* ===== Gallery ===== */
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:16px 20px;max-width:1400px;margin:0 auto}
-.card{background:#1a1a2e;border-radius:10px;overflow:hidden;border:1px solid #252540;transition:transform .3s,box-shadow .3s,border-color .3s}
-.card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(233,69,96,.15);border-color:#e94560}
-.card-img{position:relative;width:100%;height:200px;overflow:hidden;background:#111;cursor:pointer}
-.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.card:hover .card-img img{transform:scale(1.05)}
-.card-img .badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px}
-.card-body{padding:12px 14px}
-.card-body h3{font-size:14px;color:#e94560;margin-bottom:3px}
-.card-body .meta{font-size:12px;color:#666}
-.card-body .tags{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px}
-.tag{display:inline-block;padding:1px 8px;background:#e9456020;color:#e94560;border-radius:10px;font-size:11px}
-.img-err{display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:13px}
+.card-desc {
+  border-left: 3px solid #e9e5f5;
+  padding: 10px 14px;
+  margin: 14px 0;
+  color: #555;
+  font-size: 0.9em;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background: #faf9fc;
+  border-radius: 0 8px 8px 0;
+}
+.card-images {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.card-images img {
+  max-width: 320px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #000;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.card-images img:hover { transform: scale(1.03); }
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 1.1em;
+}
 
 /* ===== Lightbox ===== */
-.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;flex-direction:column;justify-content:center;align-items:center}
-.lb.open{display:flex}
-.lb img{max-width:92vw;max-height:82vh;object-fit:contain;border-radius:4px}
-.lb .x{position:absolute;top:14px;right:18px;font-size:30px;color:#fff;cursor:pointer;background:none;border:none;z-index:10}
-.lb .x:hover{color:#e94560}
-.lb .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:32px;color:#fff;background:rgba(0,0,0,.5);border:none;cursor:pointer;padding:8px 14px;border-radius:50%;transition:background .2s}
-.lb .nav:hover{background:rgba(233,69,96,.5)}
-.lb .prev{left:14px}
-.lb .next{right:14px}
-.lb .cap{color:#aaa;margin-top:10px;font-size:14px}
-.lb .counter{color:#666;font-size:12px;margin-top:4px}
-
-/* ===== Empty ===== */
-.empty{text-align:center;padding:60px 20px;grid-column:1/-1}
-.empty .icon{font-size:48px;margin-bottom:12px}
-.empty h2{color:#777;font-size:18px;margin-bottom:6px}
-.empty p{color:#555;font-size:14px}
-
-/* ===== Responsive ===== */
-@media(max-width:600px){
-    .gallery{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px}
-    .card-img{height:130px}
-    .header h1{font-size:18px}
-    .card-body{padding:8px 10px}
-    .card-body h3{font-size:13px}
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.lightbox.active { display: flex; }
+.lightbox img {
+  max-width: 92%;
+  max-height: 92%;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.lightbox .close-hint {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
 }
 </style>
 </head>
 <body>
 
-<!-- ==================== SETUP PANEL ==================== -->
-<div class="setup" id="setup">
-    <h2>⚙️ Elevation Browser 设置</h2>
-    <p>首次使用需要配置数据来源。请选择一种方式：</p>
-    
-    <div class="tab-bar">
-        <div class="tab active" onclick="switchTab('auto',this)">方式一：自动获取</div>
-        <div class="tab" onclick="switchTab('manual',this)">方式二：手动粘贴</div>
-    </div>
-    
-    <!-- Tab 1: Auto fetch -->
-    <div class="tab-content active" id="tab-auto">
-        <p>输入你的 Obsidian Publish Site Hash（在 Publish 站点按 F12 → 网络面板中查找）：</p>
-        <input type="text" id="hashInput" placeholder="例如: 67a0bc872ad33f7ad185c83238c3859fab2cc06a">
-        <div class="hint">💡 在你的 Publish 网站按 F12 → 网络(Network) → 找到包含 "publish-01.obsidian.md/access/" 的请求 → 复制 access/ 后面的那串字符</div>
-        <br>
-        <button class="btn" id="fetchBtn" onclick="autoFetch()">🔍 自动获取数据</button>
-        <div class="status" id="fetchStatus"></div>
-    </div>
-    
-    <!-- Tab 2: Manual paste -->
-    <div class="tab-content" id="tab-manual">
-        <p>在你的 Obsidian Publish 网站的浏览器控制台(F12 → Console)中运行以下脚本：</p>
-        <div class="script-box" id="scriptBox" onclick="copyScript()">// 请先在上方"自动获取"中找到 site hash，然后替换下面的值
-const HASH = '在这里粘贴你的site_hash';
+<div class="container">
+  <h1>🏠 Elevation Browser 立面浏览器</h1>
 
-(async()=>{const B=`https://publish-01.obsidian.md/access/${HASH}`;const c=await fetch(`https://publish-01.obsidian.md/cache/${HASH}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:HASH,version:'1'})});const idx=await c.json();const lk={};Object.keys(idx).forEach(p=>{lk[p.split('/').pop().toLowerCase()]=p});const ef=Object.keys(idx).filter(p=>/06 Data\/Elevation\/A-\d+\.md/i.test(p)).sort();const R=[];for(const f of ef){try{const r=await fetch(`${B}/${f.split('/').map(encodeURIComponent).join('/')}`);const md=await r.text();const imgs=[];const seen=new Set();let m;const r1=/!\[\[([^\]|]+\.(jpg|jpeg|png|gif|webp|svg|bmp))(\|[^\]]*)?\]\]/gi;while(m=r1.exec(md)){let p=m[1].trim();if(!p.includes('/')){const rp=lk[p.toLowerCase()];if(rp)p=rp}const u=`${B}/${p.split('/').map(encodeURIComponent).join('/')}`;if(!seen.has(u)){seen.add(u);imgs.push(u)}}const r2=/!\[[^\]]*\]\(([^)\s]+\.(jpg|jpeg|png|gif|webp|svg|bmp))\)/gi;while(m=r2.exec(md)){let u=m[1];if(!u.startsWith('http')){let p=u;if(!p.includes('/')){const rp=lk[p.toLowerCase()];if(rp)p=rp}u=`${B}/${p.split('/').map(encodeURIComponent).join('/')}`}if(!seen.has(u)){seen.add(u);imgs.push(u)}}const id=f.match(/A-(\d+)/);R.push({id:id?`A-${id[1]}`:f,title:`Elevation ${id?`A-${id[1]}`:f}`,tags:[],images:imgs});console.log(`✅ ${id?`A-${id[1]}`:f}: ${imgs.length} images`)}catch(e){console.error(`❌ ${f}:`,e)}}const out=JSON.stringify(R);try{await navigator.clipboard.writeText(out);console.log('📋 已复制到剪贴板！')}catch(e){}console.log(out)})();</div>
-        
-        <p style="margin-top:14px">然后将控制台输出的 JSON 数据粘贴到下方：</p>
-        <textarea id="manualData" placeholder='[{"id":"A-001","title":"Elevation A-001","tags":[],"images":["https://..."]}]'></textarea>
-        <br>
-        <button class="btn" onclick="loadManual()">📥 加载数据</button>
-        <div class="status" id="manualStatus"></div>
-    </div>
-</div>
-
-<!-- ==================== MAIN APP ==================== -->
-<div id="app" style="display:none">
-    <div class="header">
-        <h1>🏗️ <span>Elevation</span> Browser</h1>
-        <p>Elevation Pictures 筛选浏览</p>
-        <div class="search-bar">
-            <input type="text" id="search" placeholder="🔍 搜索编号、标签...">
+  <div class="filter-panel">
+    <h2>🔍 筛选条件 Filters</h2>
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label>📍 Community 社区</label>
+        <select id="f-community"><option value="">— 全部 —</option></select>
+      </div>
+      <div class="filter-group">
+        <label>🏗️ Project 项目</label>
+        <select id="f-project"><option value="">— 全部 —</option></select>
+      </div>
+      <div class="filter-group">
+        <label>🏢 Story 层数</label>
+        <select id="f-story"><option value="">— 全部 —</option></select>
+      </div>
+      <div class="filter-group">
+        <label>🧱 Wall Material 墙体材料</label>
+        <select id="f-material"><option value="">— 全部 —</option></select>
+      </div>
+      <div class="filter-group">
+        <label>🎨 Style 风格</label>
+        <select id="f-style"><option value="">— 全部 —</option></select>
+      </div>
+      <div class="filter-group">
+        <label>📐 Revit Model</label>
+        <select id="f-revit">
+          <option value="">— 全部 —</option>
+          <option value="true">✅ 有</option>
+          <option value="false">❌ 无</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>🏠 Facade Width 门面宽度 (ft)</label>
+        <div class="range-inputs">
+          <input type="number" id="facade-min" placeholder="最小">
+          <span>—</span>
+          <input type="number" id="facade-max" placeholder="最大">
         </div>
+      </div>
+      <div class="filter-group">
+        <label>📏 Lot Width 地块宽度 (ft)</label>
+        <div class="range-inputs">
+          <input type="number" id="lotw-min" placeholder="最小">
+          <span>—</span>
+          <input type="number" id="lotw-max" placeholder="最大">
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-reset" onclick="resetFilters()">🔄 重置筛选</button>
+      </div>
     </div>
-    <div class="filters" id="filters"></div>
-    <div class="stats" id="stats"></div>
-    <div class="toolbar">
-        <button class="btn-sm" onclick="resetData()">🔄 重新配置</button>
-    </div>
-    <div class="gallery" id="gallery"></div>
+  </div>
+
+  <div class="results-header">
+    <div class="results-count" id="results-count"></div>
+    <select class="sort-select" id="sort-select" onchange="applyFilters()">
+      <option value="id-asc">ID ↑</option>
+      <option value="id-desc">ID ↓</option>
+      <option value="facade-asc">Facade Width ↑ 窄→宽</option>
+      <option value="facade-desc">Facade Width ↓ 宽→窄</option>
+    </select>
+  </div>
+  <div id="results"></div>
 </div>
 
-<!-- ==================== LIGHTBOX ==================== -->
-<div class="lb" id="lb">
-    <button class="x" onclick="lbClose()">✕</button>
-    <button class="nav prev" onclick="lbNav(-1)">❮</button>
-    <button class="nav next" onclick="lbNav(1)">❯</button>
-    <img id="lbImg" src="" alt="">
-    <div class="cap" id="lbCap"></div>
-    <div class="counter" id="lbCount"></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+  <span class="close-hint">点击任意处关闭 ✕</span>
+  <img id="lightbox-img" src="">
 </div>
 
 <script>
-// ================================================================
-// DATA
-// ================================================================
-let DATA = [];
-let allImgs = [];
-let lbIdx = 0;
-let curFilter = 'all';
-let curSearch = '';
+// ===================== DATA =====================
+const elevations = [
+  {
+    id:"A-001", facade_width:70, lot_width:110, lot_depth:80,
+    wall_material:["brick","siding"], style:["traditional","gable"],
+    story:"2", community:"RAVENNA", project:"7520 Ciano Lane",
+    description:"John Staub's old house ，Same Staub house but with a different way to get into the garage - we can do two versions， one for the garage and the other for only the main facade on narrower lot\n想办法做 attach garage，好处是下雨不淋雨，可以二楼连通起來，面积更大",
+    revit_model:true,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/j9c8wuehx4ksgaguelwdr/A-001a.png?rlkey=ux2j48525x093lzmahzjojv7v&st=7ukeclu4&raw=1",
+      "https://dl.dropboxusercontent.com/scl/fi/cnr3iffxs28pqdu91ewph/A-001b.png?rlkey=jl094yv00n9bjsx9p07zqyec5&st=y6hkd70s&raw=1",
+    ]
+  },
+  {
+    id:"A-002", facade_width:50, lot_width:110, lot_depth:null,
+    wall_material:["siding"], style:[],
+    story:"2", community:"Kolbe Grove", project:null,
+    description:"LOVE this house on a wider lot and for it to set back a lot",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/xioyvqogmuw6icskr3ifj/A-002.png?rlkey=m3gnpewfv46wvc3kb6pk8wcvm&st=wcmkmyxo&raw=1"
+    ]
+  },
+  {
+    id:"A-003", facade_width:80, lot_width:null, lot_depth:null,
+    wall_material:["brick","stone"], style:["traditional"],
+    story:"2", community:null, project:null,
+    description:"基本完美",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/3e5cme0fjuks9wl0716p9/A-003.png?rlkey=n06ayaaf55lxwxwxwd1n2oe7y&st=ytznow09&raw=1"
+    ]
+  },
+  {
+    id:"A-004", facade_width:80, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional","symmetrical"],
+    story:"2", community:null, project:null,
+    description:"very nice, should do one at Celestine for sure\n喜欢对称，pediment稍微太大了，右边也可以只做一层",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/i3a893kzjbjjeva4wlj6z/A-004.png?rlkey=dess3lflo17l25nnyd1uqhchl&st=j87i7f1t&raw=1"
+    ]
+  },
+  {
+    id:"A-005", facade_width:80, lot_width:null, lot_depth:null,
+    wall_material:["stucco"], style:["symmetrical"],
+    story:"2", community:null, project:null,
+    description:"一层三个窗子，二层两个窗子，不完全对称也很好",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/w9u5kmvrygjkjhxo11b35/A-005.png?rlkey=9boagbram6lx4x4fdxopvnsvb&st=596c0inb&raw=1"
+    ]
+  },
+  {
+    id:"A-006", facade_width:80, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional","symmetrical"],
+    story:"2", community:null, project:null,
+    description:"also good, but I would make the front porch more simple. Please note these are all flat fronts, but adding a little detail like this will change the look",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/r69ptkwujiljm77vhvvl9/A-006.png?rlkey=hp0d8pp1z638ewy4ii19wkes5&st=fo5nd58e&raw=1"
+    ]
+  },
+  {
+    id:"A-007", facade_width:80, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional"],
+    story:"2", community:null, project:null,
+    description:"front door很高大，porch也很高，很喜欢",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/06x1d6guap06f8li24za5/A-007.png?rlkey=ftquyn0isdq8r2un5sc13rpwv&st=g1dhv0c3&raw=1"
+    ]
+  },
+  {
+    id:"A-008", facade_width:75, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional"],
+    story:"2", community:"Lake Celestine", project:null,
+    description:"Celestine A plus  很喜欢",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/0ts6d4g9iodspiuxa96x2/A-008.png?rlkey=ech8h6lmtrgukcl2h7lxkgr7m&st=mdyutr7n&raw=1"
+    ]
+  },
+  {
+    id:"A-009", facade_width:65, lot_width:null, lot_depth:null,
+    wall_material:["siding"], style:[],
+    story:"2", community:null, project:null,
+    description:"good to repeat很喜欢，加绿植",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/sdrsb57fuf269t2hfmgki/A-009.png?rlkey=v7cgf39xfbu06pkr0sn59l68v&st=3ap7ha16&raw=1"
+    ]
+  },
+  {
+    id:"A-010", facade_width:61, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional"],
+    story:"2", community:null, project:"5309 Cherokee St",
+    description:"Good elevation for future use especially on large lots like Celestine and solana hills",
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/02dl55qw9a7pyglokm3ke/A-010.png?rlkey=xct15t6br2i5jpwr4q283yze6&st=vycyuvku&raw=1"
+    ]
+  },
+  {
+    id:"A-011", facade_width:60, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["big_porch"],
+    story:"2", community:null, project:null,
+    description:null,
+    revit_model:false,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/r3rfqxejb3ci3lk21yzb9/A-011.png?rlkey=6p0myzyafv2zvfxmap50biaak&st=ajk3uufb&raw=1"
+    ]
+  },
+  {
+    id:"A-012", facade_width:60, lot_width:null, lot_depth:null,
+    wall_material:["brick"], style:["traditional"],
+    story:"2", community:null, project:null,
+    description:null,
+    revit_model:true,
+    images:[
+      "https://dl.dropboxusercontent.com/scl/fi/5u5hbkjzbwkqel00uxxiz/A-012.png?rlkey=r1t6w55gu62t4fu87ubc9thx6&st=wp1e1isf&raw=1",
+      "https://dl.dropboxusercontent.com/scl/fi/9i9jd251ifz7erjhtf0dp/A-012a.png?rlkey=9h3lchkmlu9as7gwhqj4o94iq&st=ql4cbmi4&raw=1"
+    ]
+  }
+];
 
-// ================================================================
-// BOOT
-// ================================================================
-function boot() {
-    const saved = localStorage.getItem('elev_data');
-    if (saved) {
-        try {
-            DATA = JSON.parse(saved);
-        } catch(e) { DATA = []; }
+// ===================== INIT FILTERS =====================
+function getUnique(key) {
+  const s = new Set();
+  elevations.forEach(e => {
+    const v = e[key];
+    if (Array.isArray(v)) v.forEach(x => { if(x) s.add(x); });
+    else if (v) s.add(String(v));
+  });
+  return [...s].sort();
+}
+
+function populateSelect(id, vals) {
+  const sel = document.getElementById(id);
+  vals.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+
+populateSelect('f-community', getUnique('community'));
+populateSelect('f-project',   getUnique('project'));
+populateSelect('f-story',     getUnique('story'));
+populateSelect('f-material',  getUnique('wall_material'));
+populateSelect('f-style',     getUnique('style'));
+
+// ===================== FILTER LOGIC =====================
+function applyFilters() {
+  const community = document.getElementById('f-community').value;
+  const project   = document.getElementById('f-project').value;
+  const story     = document.getElementById('f-story').value;
+  const material  = document.getElementById('f-material').value;
+  const style     = document.getElementById('f-style').value;
+  const revit     = document.getElementById('f-revit').value;
+  const fMin  = parseFloat(document.getElementById('facade-min').value) || null;
+  const fMax  = parseFloat(document.getElementById('facade-max').value) || null;
+  const lwMin = parseFloat(document.getElementById('lotw-min').value)   || null;
+  const lwMax = parseFloat(document.getElementById('lotw-max').value)   || null;
+
+  let filtered = elevations.filter(e => {
+    if (community && e.community !== community) return false;
+    if (project) {
+      const p = Array.isArray(e.project) ? e.project : [e.project];
+      if (!p.includes(project)) return false;
     }
-    if (DATA.length > 0) {
-        showApp();
-    } else {
-        document.getElementById('setup').style.display = 'block';
+    if (story && e.story !== story) return false;
+    if (material && !(e.wall_material||[]).includes(material)) return false;
+    if (style && !(e.style||[]).includes(style)) return false;
+    if (revit==='true'  && !e.revit_model) return false;
+    if (revit==='false' &&  e.revit_model) return false;
+    if (fMin  && (!e.facade_width || e.facade_width < fMin)) return false;
+    if (fMax  && (!e.facade_width || e.facade_width > fMax)) return false;
+    if (lwMin && (!e.lot_width    || e.lot_width < lwMin))   return false;
+    if (lwMax && (!e.lot_width    || e.lot_width > lwMax))   return false;
+    return true;
+  });
+
+  const sort = document.getElementById('sort-select').value;
+  filtered.sort((a,b) => {
+    if (sort==='id-asc')      return a.id.localeCompare(b.id);
+    if (sort==='id-desc')     return b.id.localeCompare(a.id);
+    if (sort==='facade-asc')  return (a.facade_width||0)-(b.facade_width||0);
+    if (sort==='facade-desc') return (b.facade_width||0)-(a.facade_width||0);
+  });
+
+  render(filtered);
+}
+
+function resetFilters() {
+  document.querySelectorAll('.filter-panel select').forEach(s => s.value='');
+  document.querySelectorAll('.filter-panel input').forEach(i => i.value='');
+  document.getElementById('sort-select').value = 'id-asc';
+  applyFilters();
+}
+
+// ===================== RENDER =====================
+function esc(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function render(data) {
+  document.getElementById('results-count').innerHTML =
+    '📋 共找到 <strong>' + data.length + '</strong> 条结果（共 ' + elevations.length + ' 条）';
+
+  if (!data.length) {
+    document.getElementById('results').innerHTML =
+      '<div class="no-results">😔 没有找到匹配的立面<br>请调整筛选条件</div>';
+    return;
+  }
+
+  document.getElementById('results').innerHTML = data.map(e => {
+    const tags = [];
+    if (e.facade_width) tags.push('<span class="tag tag-size">🏠 Facade: '+e.facade_width+"'</span>");
+    if (e.lot_width)    tags.push('<span class="tag tag-size">📐 Lot W: '+e.lot_width+"'</span>");
+    if (e.lot_depth)    tags.push('<span class="tag tag-size">📐 Lot D: '+e.lot_depth+"'</span>");
+    if (e.story)        tags.push('<span class="tag tag-story">🏢 '+e.story+' Story</span>');
+    if (e.community)    tags.push('<span class="tag tag-community">📍 '+e.community+'</span>');
+    if (e.wall_material && e.wall_material.length)
+      tags.push('<span class="tag tag-material">🧱 '+e.wall_material.join(', ')+'</span>');
+    if (e.style && e.style.length)
+      tags.push('<span class="tag tag-style">🎨 '+e.style.join(', ')+'</span>');
+    if (e.project) {
+      const p = Array.isArray(e.project) ? e.project.join(', ') : e.project;
+      tags.push('<span class="tag tag-project">🏗️ '+p+'</span>');
     }
+    if (e.revit_model) tags.push('<span class="tag tag-revit">✅ Revit Model</span>');
+
+    const desc = e.description
+      ? '<div class="card-desc">'+esc(e.description)+'</div>' : '';
+
+    const imgs = e.images && e.images.length
+      ? '<div class="card-images">'+e.images.map((u,i) =>
+          '<img src="'+u+'" alt="'+e.id+' image '+(i+1)+'" onclick="openLB(this.src); event.stopPropagation();" loading="lazy">'
+        ).join('')+'</div>' : '';
+
+    return '<div class="card">' +
+      '<div class="card-title">'+e.id+'</div>' +
+      '<div class="card-meta">'+tags.join('')+'</div>' +
+      desc + imgs +
+    '</div>';
+  }).join('');
 }
 
-// ================================================================
-// SETUP: Tab switching
-// ================================================================
-function switchTab(id, btn) {
-    document.querySelectorAll('.setup .tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.setup .tab-content').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + id).classList.add('active');
+function openLB(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('active');
 }
 
-// ================================================================
-// SETUP: Auto fetch from API
-// ================================================================
-async function autoFetch() {
-    const hash = document.getElementById('hashInput').value.trim();
-    if (!hash) { alert('请输入 Site Hash'); return; }
-    
-    const btn = document.getElementById('fetchBtn');
-    const status = document.getElementById('fetchStatus');
-    btn.disabled = true;
-    status.style.display = 'block';
-    status.textContent = '🔄 正在连接 Obsidian Publish API...';
-    
-    try {
-        const BASE = `https://publish-01.obsidian.md/access/${hash}`;
-        
-        // 1. Get file index
-        status.textContent += '\n📂 获取文件索引...';
-        const cacheResp = await fetch(`https://publish-01.obsidian.md/cache/${hash}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: hash, version: '1' })
-        });
-        
-        if (!cacheResp.ok) throw new Error('API 返回 ' + cacheResp.status);
-        const cache = await cacheResp.json();
-        
-        // Build path lookup
-        const lk = {};
-        Object.keys(cache).forEach(p => {
-            lk[p.split('/').pop().toLowerCase()] = p;
-        });
-        
-        // Find elevation files
-        const elevFiles = Object.keys(cache)
-            .filter(p => /06 Data\/Elevation\/A-\d+\.md/i.test(p))
-            .sort();
-        
-        status.textContent += `\n✅ 找到 ${elevFiles.length} 个立面文件`;
-        
-        if (elevFiles.length === 0) {
-            status.textContent += '\n⚠️ 未找到 "06 Data/Elevation/A-xxx.md" 格式的文件';
-            status.textContent += '\n可用文件列表:';
-            Object.keys(cache).filter(p => p.includes('Elevation')).forEach(p => {
-                status.textContent += '\n  → ' + p;
-            });
-            btn.disabled = false;
-            return;
-        }
-        
-        // 2. Fetch each file
-        const results = [];
-        for (const filePath of elevFiles) {
-            const encPath = filePath.split('/').map(encodeURIComponent).join('/');
-            try {
-                const resp = await fetch(`${BASE}/${encPath}`);
-                if (!resp.ok) {
-                    status.textContent += `\n⚠️ ${filePath}: HTTP ${resp.status}`;
-                    continue;
-                }
-                const md = await resp.text();
-                const images = extractImages(md, BASE, lk);
-                const idMatch = filePath.match(/A-(\d+)/);
-                const id = idMatch ? 'A-' + idMatch[1] : filePath.split('/').pop().replace('.md','');
-                
-                results.push({
-                    id: id,
-                    title: 'Elevation ' + id,
-                    tags: [],
-                    images: images
-                });
-                status.textContent += `\n✅ ${id}: ${images.length} 张图片`;
-            } catch(e) {
-                status.textContent += `\n❌ ${filePath}: ${e.message}`;
-            }
-            await sleep(150);
-        }
-        
-        if (results.length === 0) throw new Error('没有成功提取任何数据');
-        
-        DATA = results;
-        localStorage.setItem('elev_data', JSON.stringify(DATA));
-        localStorage.setItem('elev_hash', hash);
-        
-        const totalImgs = results.reduce((s, r) => s + r.images.length, 0);
-        status.textContent += `\n\n🎉 完成！共 ${results.length} 个立面，${totalImgs} 张图片`;
-        status.innerHTML += '<br><br><button class="btn" onclick="showApp()">✨ 进入浏览器</button>';
-        
-    } catch(e) {
-        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('CORS')) {
-            status.innerHTML = `<span class="error">❌ 无法直接访问 API（CORS 限制）</span>
+// ===================== EVENTS =====================
+document.querySelectorAll('.filter-panel select, .filter-panel input')
+  .forEach(el => {
+    el.addEventListener('change', applyFilters);
+    el.addEventListener('input', applyFilters);
+  });
 
-<strong>请使用"方式二：手动粘贴"：</strong>
-1. 打开你的 Obsidian Publish 网站
-2. 按 F12 → Console（控制台）
-3. 运行提取脚本
-4. 将结果粘贴到"手动粘贴"标签页中`;
-        } else {
-            status.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
-        }
-    }
-    btn.disabled = false;
-}
-
-function extractImages(md, base, lk) {
-    const imgs = [], seen = new Set();
-    let m;
-    // ![[file.ext]] or ![[file.ext|size]]
-    const r1 = /!\[\[([^\]|]+\.(jpg|jpeg|png|gif|webp|svg|bmp))(\|[^\]]*)?\]\]/gi;
-    while (m = r1.exec(md)) {
-        let p = m[1].trim();
-        if (!p.includes('/')) { const rp = lk[p.toLowerCase()]; if (rp) p = rp; }
-        const u = base + '/' + p.split('/').map(encodeURIComponent).join('/');
-        if (!seen.has(u)) { seen.add(u); imgs.push(u); }
-    }
-    // ![alt](url)
-    const r2 = /!\[[^\]]*\]\(([^)\s]+\.(jpg|jpeg|png|gif|webp|svg|bmp))\)/gi;
-    while (m = r2.exec(md)) {
-        let u = m[1];
-        if (!u.startsWith('http')) {
-            let p = u;
-            if (!p.includes('/')) { const rp = lk[p.toLowerCase()]; if (rp) p = rp; }
-            u = base + '/' + p.split('/').map(encodeURIComponent).join('/');
-        }
-        if (!seen.has(u)) { seen.add(u); imgs.push(u); }
-    }
-    return imgs;
-}
-
-// ================================================================
-// SETUP: Manual data paste
-// ================================================================
-function loadManual() {
-    const raw = document.getElementById('manualData').value.trim();
-    const status = document.getElementById('manualStatus');
-    status.style.display = 'block';
-    
-    if (!raw) { status.innerHTML = '<span class="error">请粘贴 JSON 数据</span>'; return; }
-    
-    try {
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('数据格式错误');
-        
-        DATA = parsed;
-        localStorage.setItem('elev_data', JSON.stringify(DATA));
-        
-        const totalImgs = DATA.reduce((s, r) => s + (r.images || []).length, 0);
-        status.innerHTML = `<span class="success">✅ 加载成功！${DATA.length} 个立面，${totalImgs} 张图片</span>`;
-        status.innerHTML += '<br><br><button class="btn" onclick="showApp()">✨ 进入浏览器</button>';
-    } catch(e) {
-        status.innerHTML = '<span class="error">❌ JSON 解析失败: ' + e.message + '</span>';
-    }
-}
-
-function copyScript() {
-    const text = document.getElementById('scriptBox').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        const box = document.getElementById('scriptBox');
-        box.style.borderColor = '#4caf50';
-        setTimeout(() => box.style.borderColor = '#333', 1500);
-    }).catch(() => {});
-}
-
-// ================================================================
-// SHOW APP
-// ================================================================
-function showApp() {
-    document.getElementById('setup').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    buildFilters();
-    render();
-    
-    document.getElementById('search').addEventListener('input', e => {
-        curSearch = e.target.value.toLowerCase().trim();
-        render();
-    });
-}
-
-function resetData() {
-    if (!confirm('确定要重新配置吗？')) return;
-    localStorage.removeItem('elev_data');
-    localStorage.removeItem('elev_hash');
-    DATA = [];
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('setup').style.display = 'block';
-}
-
-// ================================================================
-// FILTERS
-// ================================================================
-function buildFilters() {
-    const el = document.getElementById('filters');
-    el.innerHTML = '<button class="fbtn active" onclick="setFilter(\'all\',this)">全部</button>';
-    
-    const tags = new Set();
-    DATA.forEach(d => {
-        tags.add(d.id);
-        if (d.tags) d.tags.forEach(t => tags.add(t));
-    });
-    
-    [...tags].sort().forEach(t => {
-        const b = document.createElement('button');
-        b.className = 'fbtn';
-        b.textContent = t;
-        b.onclick = () => setFilter(t, b);
-        el.appendChild(b);
-    });
-}
-
-function setFilter(f, btn) {
-    curFilter = f;
-    document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-}
-
-// ================================================================
-// GALLERY
-// ================================================================
-function render() {
-    const g = document.getElementById('gallery');
-    g.innerHTML = '';
-    allImgs = [];
-    let count = 0;
-    
-    DATA.forEach(item => {
-        // Filter
-        if (curFilter !== 'all') {
-            if (item.id !== curFilter && !(item.tags && item.tags.includes(curFilter))) return;
-        }
-        // Search
-        if (curSearch) {
-            const hay = [item.id, item.title || '', ...(item.tags || [])].join(' ').toLowerCase();
-            if (!hay.includes(curSearch)) return;
-        }
-        
-        const imgs = item.images || [];
-        imgs.forEach((url, i) => {
-            const gi = allImgs.length;
-            allImgs.push({ url, cap: (item.title || item.id) + ' — 图片 ' + (i+1) + '/' + imgs.length });
-            count++;
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-img" onclick="lbOpen(${gi})">
-                    <img src="${url}" alt="${item.id}" loading="lazy"
-                         onerror="this.parentElement.innerHTML='<div class=img-err>图片加载失败</div>'">
-                    <span class="badge">${i+1}/${imgs.length}</span>
-                </div>
-                <div class="card-body">
-                    <h3>${item.title || item.id}</h3>
-                    <div class="meta">图片 ${i+1} / ${imgs.length}</div>
-                    ${item.tags && item.tags.length ? '<div class="tags">' + item.tags.map(t=>'<span class="tag">'+t+'</span>').join('') + '</div>' : ''}
-                </div>`;
-            g.appendChild(card);
-        });
-    });
-    
-    document.getElementById('stats').textContent = count > 0 ? '共 ' + count + ' 张图片' : '';
-    
-    if (count === 0) {
-        g.innerHTML = '<div class="empty"><div class="icon">🔍</div><h2>没有匹配结果</h2><p>尝试调整筛选条件或搜索关键词</p></div>';
-    }
-}
-
-// ================================================================
-// LIGHTBOX
-// ================================================================
-function lbOpen(i) {
-    lbIdx = i;
-    lbUpdate();
-    document.getElementById('lb').classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
-function lbClose() {
-    document.getElementById('lb').classList.remove('open');
-    document.body.style.overflow = '';
-}
-function lbNav(d) {
-    lbIdx = (lbIdx + d + allImgs.length) % allImgs.length;
-    lbUpdate();
-}
-function lbUpdate() {
-    const item = allImgs[lbIdx];
-    document.getElementById('lbImg').src = item.url;
-    document.getElementById('lbCap').textContent = item.cap;
-    document.getElementById('lbCount').textContent = (lbIdx + 1) + ' / ' + allImgs.length;
-}
-
-// Keyboard & click
+// ESC 关闭大图
 document.addEventListener('keydown', e => {
-    if (!document.getElementById('lb').classList.contains('open')) return;
-    if (e.key === 'Escape') lbClose();
-    if (e.key === 'ArrowLeft') lbNav(-1);
-    if (e.key === 'ArrowRight') lbNav(1);
-});
-document.getElementById('lb').addEventListener('click', e => {
-    if (e.target === document.getElementById('lb')) lbClose();
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('active');
 });
 
-// ================================================================
-// UTILS
-// ================================================================
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ================================================================
-// START
-// ================================================================
-boot();
+applyFilters();
 </script>
 </body>
 </html>
